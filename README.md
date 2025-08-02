@@ -127,7 +127,7 @@ This will:
 - Set up the necessary environment variables
 - Create persistent volume for database data
 
-The application will be available at `http://localhost:3000`
+The application will be available at `http://localhost:8080`
 
 #### Docker Compose Commands
 
@@ -173,7 +173,7 @@ docker run --name postgres-url-fetcher \
 3. Start the application:
 ```bash
 docker run --name url-fetcher-app \
-  -p 3000:3000 \
+  -p 8080:3000 \
   -e DB_HOST=host.docker.internal \
   -e DB_PORT=5432 \
   -e DB_NAME=url-fetcher \
@@ -206,7 +206,7 @@ docker run --name postgres-url-fetcher \
 
 # Start the application
 docker run --name url-fetcher-app \
-  -p 3000:3000 \
+  -p 8080:3000 \
   -e DB_HOST=host.docker.internal \
   -e DB_PORT=5432 \
   -e DB_NAME=url-fetcher \
@@ -504,7 +504,7 @@ The application uses the following environment variables:
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
 | `NODE_ENV` | Application environment | `development` | No |
-| `PORT` | Application port | `3000` | No |
+| `PORT` | Application port | `3000` (local) / `8080` (Docker) | No |
 | `DB_HOST` | PostgreSQL host | `localhost` | Yes |
 | `DB_PORT` | PostgreSQL port | `5432` | No |
 | `DB_NAME` | Database name | `url-fetcher` | Yes |

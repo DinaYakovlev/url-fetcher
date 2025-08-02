@@ -41,11 +41,11 @@ RUN chown -R nestjs:nodejs /app
 USER nestjs
 
 # Expose port
-EXPOSE 3000
+EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node dist/health.js || exit 1
 
 # Start the application
-CMD ["node", "dist/src/main.js"] 
+CMD ["node", "dist/main.js"] 
