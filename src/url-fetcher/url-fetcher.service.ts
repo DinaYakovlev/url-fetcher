@@ -35,8 +35,16 @@ export class UrlFetcherService {
   async fetchUrls(createUrlFetchDto: CreateUrlFetchDto): Promise<UrlFetch[]> {
     this.logger.log(`Starting to fetch ${createUrlFetchDto.urls.length} URLs in parallel`);
 
+    // Remove duplicates while preserving order
+    const uniqueUrls = [...new Set(createUrlFetchDto.urls)];
+    
+    if (uniqueUrls.length !== createUrlFetchDto.urls.length) {
+      const duplicateCount = createUrlFetchDto.urls.length - uniqueUrls.length;
+      this.logger.log(`Removed ${duplicateCount} duplicate URLs. Processing ${uniqueUrls.length} unique URLs`);
+    }
+
     try {
-      const { validUrls, invalidUrls } = this.securityService.validateUrls(createUrlFetchDto.urls);
+      const { validUrls, invalidUrls } = this.securityService.validateUrls(uniqueUrls);
 
       if (invalidUrls.length > 0) {
         const errorMessage = `Invalid URLs detected: ${invalidUrls.map(item => `${item.url} (${item.error})`).join(', ')}`;
