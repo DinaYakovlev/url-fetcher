@@ -20,7 +20,9 @@ A NestJS service for fetching URLs and storing the results in PostgreSQL. Built 
 
 ## Installation
 
-### Upgrading Node.js
+### Option 1: Local Development
+
+#### Upgrading Node.js
 
 This project requires Node.js 24.x.x. If you're using an older version, you can upgrade using nvm:
 
@@ -69,6 +71,149 @@ NODE_ENV=development
 4. Create the PostgreSQL database:
 ```sql
 CREATE DATABASE url_fetcher;
+```
+
+### Option 2: Docker (Recommended)
+
+#### Prerequisites
+- Docker
+- Docker Compose (or use manual Docker commands below)
+
+#### Installing Docker Compose
+
+If you don't have Docker Compose installed:
+
+**macOS:**
+```bash
+# Install via Homebrew
+brew install docker-compose
+
+# Or download directly
+curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+```
+
+**Linux:**
+```bash
+# Install via package manager
+sudo apt-get update
+sudo apt-get install docker-compose-plugin
+
+# Or download directly
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+**Windows:**
+Docker Compose is included with Docker Desktop for Windows.
+
+#### Quick Start with Docker Compose
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd url-fetcher
+```
+
+2. Start the application with Docker Compose:
+```bash
+docker-compose up -d
+```
+
+This will:
+- Build the application Docker image
+- Start a PostgreSQL database container
+- Start the application container
+- Set up the necessary environment variables
+- Create persistent volume for database data
+
+The application will be available at `http://localhost:3000`
+
+#### Docker Compose Commands
+
+```bash
+# Start services in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f app
+
+# Stop services
+docker-compose down
+
+# Stop services and remove volumes
+docker-compose down -v
+
+# Rebuild and start
+docker-compose up --build -d
+
+# View service status
+docker-compose ps
+```
+
+#### Manual Docker Setup (Alternative)
+
+If you don't have Docker Compose, you can run the containers manually:
+
+1. Build the image:
+```bash
+docker build -t url-fetcher .
+```
+
+2. Start PostgreSQL:
+```bash
+docker run --name postgres-url-fetcher \
+  -e POSTGRES_DB=url_fetcher \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=password \
+  -p 5432:5432 \
+  -d postgres:15
+```
+
+3. Start the application:
+```bash
+docker run --name url-fetcher-app \
+  -p 3000:3000 \
+  -e DB_HOST=host.docker.internal \
+  -e DB_PORT=5432 \
+  -e DB_NAME=url_fetcher \
+  -e DB_USERNAME=postgres \
+  -e DB_PASSWORD=password \
+  --link postgres-url-fetcher:postgres \
+  -d url-fetcher
+```
+
+**Note:** On Linux, replace `host.docker.internal` with the actual IP address of your host machine or use `--network host` flag.
+
+#### Manual Docker Build
+
+If you prefer to build the Docker image manually:
+
+1. Build the image:
+```bash
+docker build -t url-fetcher .
+```
+
+2. Run with PostgreSQL:
+```bash
+# Start PostgreSQL container
+docker run --name postgres-url-fetcher \
+  -e POSTGRES_DB=url_fetcher \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=password \
+  -p 5432:5432 \
+  -d postgres:15
+
+# Start the application
+docker run --name url-fetcher-app \
+  -p 3000:3000 \
+  -e DB_HOST=host.docker.internal \
+  -e DB_PORT=5432 \
+  -e DB_NAME=url_fetcher \
+  -e DB_USERNAME=postgres \
+  -e DB_PASSWORD=password \
+  --link postgres-url-fetcher:postgres \
+  -d url-fetcher
 ```
 
 ## Running the Application
@@ -352,14 +497,46 @@ CREATE INDEX idx_url_trgm ON url_fetches USING gin (url gin_trgm_ops);
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 ```
 
+#### Environment Variables
+
+The application uses the following environment variables:
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `NODE_ENV` | Application environment | `development` | No |
+| `PORT` | Application port | `3000` | No |
+| `DB_HOST` | PostgreSQL host | `localhost` | Yes |
+| `DB_PORT` | PostgreSQL port | `5432` | No |
+| `DB_NAME` | Database name | `url-fetcher` | Yes |
+| `DB_USERNAME` | Database user | `devuser` | Yes |
+| `DB_PASSWORD` | Database password | - | Yes |
+
+#### Local Development Database
+
 For local development with Docker PostgreSQL:
 ```bash
 # Start PostgreSQL container
 docker run --name postgres-url-fetcher \
   -e POSTGRES_DB=url_fetcher \
   -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=password \
   -p 5432:5432 \
   -d postgres:15
+```
+
+#### Docker Environment
+
+When using Docker Compose, the environment variables are automatically configured:
+
+```yaml
+environment:
+  - NODE_ENV=production
+  - PORT=3000
+  - DB_HOST=postgres
+  - DB_PORT=5432
+  - DB_NAME=url_fetcher
+  - DB_USERNAME=postgres
+  - DB_PASSWORD=password
 ```
 
 ## Error Handling
