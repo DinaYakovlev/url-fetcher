@@ -2,7 +2,6 @@ import { expect } from 'chai';
 import { describe, it, before, after } from 'mocha';
 import { TestUtils } from '../utils/test-utils';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
 
 describe('API Endpoints System Tests', () => {
   let app: INestApplication;
@@ -109,7 +108,8 @@ describe('API Endpoints System Tests', () => {
         })
         .expect(400);
 
-      expect(response.body.message).to.include('validation');
+      expect(response.body.message).to.be.an('array');
+      expect(response.body.message[0]).to.include('urls');
     });
 
     it('should reject invalid request body', async () => {
@@ -120,7 +120,24 @@ describe('API Endpoints System Tests', () => {
         })
         .expect(400);
 
-      expect(response.body.message).to.include('validation');
+      expect(response.body.message).to.be.an('array');
+      expect(response.body.message[0]).to.include('property invalidField should not exist');
+    });
+
+    it('should reject request body with extra fields', async () => {
+      const response = await httpRequest
+        .post('/v1/url-fetches')
+        .send({
+          invalidField: 'test',
+          urls: [
+            'https://httpbin.org/status/200',
+            'https://httpbin.org/json'
+          ]
+        })
+        .expect(400);
+
+      expect(response.body.message).to.be.an('array');
+      expect(response.body.message[0]).to.include('property invalidField should not exist');
     });
   });
 
@@ -182,8 +199,6 @@ describe('API Endpoints System Tests', () => {
     });
   });
 
-
-
   describe('GET /v1/url-fetches/:id', () => {
     let testId: number;
 
@@ -205,7 +220,7 @@ describe('API Endpoints System Tests', () => {
 
       expect(response.body.message).to.include('URL fetch found');
       expect(response.body.data.id).to.equal(testId);
-      expect(response.body.data.url).to.equal('https://httpbin.org/status/200/');
+      expect(response.body.data.url).to.equal('https://httpbin.org/status/200');
     });
 
     it('should return 404 for non-existent ID', async () => {
@@ -222,7 +237,7 @@ describe('API Endpoints System Tests', () => {
         .get('/v1/url-fetches/invalid')
         .expect(400);
 
-      expect(response.body.message).to.include('validation');
+      expect(response.body.message).to.include('Invalid ID format');
     });
   });
 }); 

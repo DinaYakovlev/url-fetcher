@@ -54,42 +54,24 @@ describe('UrlFetcherService', () => {
         }
       ];
 
-      const mockSavedResults: UrlFetch[] = [
+      const mockSavedResults = [
         {
           id: 1,
           url: 'https://example.com',
-          responseStatus: 200,
-          responseHeaders: { 'content-type': 'text/html' },
-          responseBody: '<html>Test</html>',
-          contentType: 'text/html',
-          fetchedAt: new Date(),
-          toJSON: () => ({
-            id: 1,
-            url: 'https://example.com',
-            response_status: 200,
-            response_headers: { 'content-type': 'text/html' },
-            response_body: '<html>Test</html>',
-            content_type: 'text/html',
-            fetched_at: new Date()
-          })
+          response_status: 200,
+          response_headers: { 'content-type': 'text/html' },
+          response_body: '<html>Test</html>',
+          content_type: 'text/html',
+          fetched_at: new Date()
         },
         {
           id: 2,
           url: 'https://httpbin.org',
-          responseStatus: 200,
-          responseHeaders: { 'content-type': 'application/json' },
-          responseBody: '{"test": true}',
-          contentType: 'application/json',
-          fetchedAt: new Date(),
-          toJSON: () => ({
-            id: 2,
-            url: 'https://httpbin.org',
-            response_status: 200,
-            response_headers: { 'content-type': 'application/json' },
-            response_body: '{"test": true}',
-            content_type: 'application/json',
-            fetched_at: new Date()
-          })
+          response_status: 200,
+          response_headers: { 'content-type': 'application/json' },
+          response_body: '{"test": true}',
+          content_type: 'application/json',
+          fetched_at: new Date()
         }
       ];
 
@@ -177,24 +159,15 @@ describe('UrlFetcherService', () => {
         }
       ];
 
-      const mockSavedResults: UrlFetch[] = [
+      const mockSavedResults = [
         {
           id: 1,
           url: 'https://example.com',
-          responseStatus: 200,
-          responseHeaders: { 'content-type': 'text/html' },
-          responseBody: '<html>Test</html>',
-          contentType: 'text/html',
-          fetchedAt: new Date(),
-          toJSON: () => ({
-            id: 1,
-            url: 'https://example.com',
-            response_status: 200,
-            response_headers: { 'content-type': 'text/html' },
-            response_body: '<html>Test</html>',
-            content_type: 'text/html',
-            fetched_at: new Date()
-          })
+          response_status: 200,
+          response_headers: { 'content-type': 'text/html' },
+          response_body: '<html>Test</html>',
+          content_type: 'text/html',
+          fetched_at: new Date()
         }
       ];
 
@@ -262,23 +235,14 @@ describe('UrlFetcherService', () => {
         contentType: 'text/html'
       };
 
-      const mockSavedResult: UrlFetch = {
+      const mockSavedResult = {
         id: 1,
         url: 'https://example.com',
-        responseStatus: 200,
-        responseHeaders: { 'content-type': 'text/html' },
-        responseBody: '<html>Test</html>',
-        contentType: 'text/html',
-        fetchedAt: new Date(),
-        toJSON: () => ({
-          id: 1,
-          url: 'https://example.com',
-          response_status: 200,
-          response_headers: { 'content-type': 'text/html' },
-          response_body: '<html>Test</html>',
-          content_type: 'text/html',
-          fetched_at: new Date()
-        })
+        response_status: 200,
+        response_headers: { 'content-type': 'text/html' },
+        response_body: '<html>Test</html>',
+        content_type: 'text/html',
+        fetched_at: new Date()
       };
 
       securityService.validateUrls.returns({

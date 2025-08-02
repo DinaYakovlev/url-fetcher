@@ -10,7 +10,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "test:unit": "mocha --require ts-node/register --require tsconfig-paths/register \"test/unit/*.test.ts\"",
-    "test:system": "mocha --require ts-node/register --require tsconfig-paths/register \"test/system/*.test.ts\"",
+    "test:system": "mocha --require ts-node/register \"test/system/*.test.ts\"",
     "test:coverage": "nyc mocha --require ts-node/register --require tsconfig-paths/register test/**/*.test.ts"
   },
   "dependencies": {

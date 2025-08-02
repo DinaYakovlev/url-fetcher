@@ -141,7 +141,13 @@ export class PostgresService {
 
         if (upsertResult.raw && upsertResult.raw[0]) {
           const urlFetch = new UrlFetch();
-          Object.assign(urlFetch, upsertResult.raw[0]);
+          urlFetch.id = upsertResult.raw[0].id;
+          urlFetch.url = upsertResult.raw[0].url;
+          urlFetch.responseStatus = upsertResult.raw[0].response_status;
+          urlFetch.responseHeaders = upsertResult.raw[0].response_headers;
+          urlFetch.responseBody = upsertResult.raw[0].response_body;
+          urlFetch.contentType = upsertResult.raw[0].content_type;
+          urlFetch.fetchedAt = upsertResult.raw[0].fetched_at;
           savedResults.push(urlFetch);
         }
       }
@@ -150,7 +156,8 @@ export class PostgresService {
       this.metricsService.recordDatabaseQuery(queryTime, 'save_fetch_results');
 
       this.logger.log(`Upserted ${savedResults.length} URL fetch results`);
-      return savedResults;
+      
+      return savedResults.map(result => result.toJSON() as any);
     } catch (error) {
       const queryTime = Date.now() - startTime;
       this.metricsService.recordDatabaseQuery(queryTime, 'save_fetch_results');
@@ -249,7 +256,12 @@ export class PostgresService {
 
   async getUrlFetchById(id: number): Promise<UrlFetch | null> {
     try {
-      return await this.urlFetchRepository.findOne({ where: { id } });
+      const result = await this.urlFetchRepository.findOne({ where: { id } });
+      if (!result) {
+        return null;
+      }
+      
+      return result.toJSON() as any;
     } catch (error) {
       this.handleDatabaseError(error, `Failed to retrieve URL fetch with id ${id}`);
     }

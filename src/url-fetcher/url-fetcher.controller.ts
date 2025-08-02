@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, HttpStatus, HttpCode, Param, Query } from '@nestjs/common';
+import { Controller, Post, Get, Body, HttpStatus, HttpCode, Param, Query, BadRequestException } from '@nestjs/common';
 import { UrlFetcherService } from './url-fetcher.service';
 import { CreateUrlFetchDto } from './dto/create-url-fetch.dto';
 import { UrlFetch } from './entities/url-fetch.entity';
@@ -86,7 +86,12 @@ export class UrlFetcherController {
     message: string;
     data: UrlFetch | null;
   }> {
-    const result = await this.urlFetcherService.getUrlFetchById(parseInt(id));
+    const parsedId = parseInt(id);
+    if (isNaN(parsedId)) {
+      throw new BadRequestException('Invalid ID format. ID must be a valid integer.');
+    }
+    
+    const result = await this.urlFetcherService.getUrlFetchById(parsedId);
     
     return {
       message: result ? 'URL fetch found' : 'URL fetch not found',

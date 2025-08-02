@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
 
@@ -14,8 +14,24 @@ export class TestUtils {
   static async createApp(): Promise<INestApplication> {
     const moduleFixture = await this.createTestingModule();
     const app = moduleFixture.createNestApplication();
+    
+    // Configure the app like in main.ts
+    app.useGlobalPipes(new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }));
+    app.setGlobalPrefix('v1');
+    
     await app.init();
     return app;
+  }
+
+  static createRequestForRunningServer(): any {
+    return request('http://localhost:3000');
   }
 
   static async closeApp(app: INestApplication): Promise<void> {

@@ -103,6 +103,7 @@ export class UrlFetcherService {
       const savedResults = await this.postgresService.saveFetchResults(sanitizedResults);
 
       this.logger.log(`Successfully processed ${savedResults.length} URLs out of ${validUrls.length} validated URLs`);
+      
       return savedResults;
     } catch (error) {
       this.logger.error('Error in fetchUrls:', error);

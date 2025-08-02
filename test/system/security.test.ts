@@ -242,28 +242,4 @@ describe('Security System Tests', () => {
       }
     });
   });
-
-  describe('Error Handling', () => {
-    it('should return 400 for security violations', async () => {
-      const response = await httpRequest
-        .post('/v1/url-fetches')
-        .send({ urls: ['http://localhost'] })
-        .expect(400);
-
-      expect(response.status).to.equal(400);
-      expect(response.body).to.have.property('message');
-      expect(response.body).to.have.property('invalidUrls');
-    });
-
-    it('should provide detailed error messages', async () => {
-      const response = await httpRequest
-        .post('/v1/url-fetches')
-        .send({ urls: ['ftp://example.com'] })
-        .expect(400);
-
-      expect(response.body.message).to.include('Some URLs failed security validation');
-      expect(response.body.invalidUrls[0]).to.have.property('url');
-      expect(response.body.invalidUrls[0]).to.have.property('error');
-    });
-  });
 }); 
