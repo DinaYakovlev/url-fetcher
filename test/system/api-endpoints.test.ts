@@ -109,7 +109,7 @@ describe('API Endpoints System Tests', () => {
         .expect(400);
 
       expect(response.body.message).to.be.an('array');
-      expect(response.body.message[0]).to.include('urls');
+      expect(response.body.message[0]).to.include('URL');
     });
 
     it('should reject invalid request body', async () => {
