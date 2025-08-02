@@ -70,7 +70,7 @@ NODE_ENV=development
 
 4. Create the PostgreSQL database:
 ```sql
-CREATE DATABASE url_fetcher;
+CREATE DATABASE url-fetcher;
 ```
 
 ### Option 2: Docker (Recommended)
@@ -163,7 +163,7 @@ docker build -t url-fetcher .
 2. Start PostgreSQL:
 ```bash
 docker run --name postgres-url-fetcher \
-  -e POSTGRES_DB=url_fetcher \
+  -e POSTGRES_DB=url-fetcher \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=password \
   -p 5432:5432 \
@@ -176,7 +176,7 @@ docker run --name url-fetcher-app \
   -p 3000:3000 \
   -e DB_HOST=host.docker.internal \
   -e DB_PORT=5432 \
-  -e DB_NAME=url_fetcher \
+  -e DB_NAME=url-fetcher \
   -e DB_USERNAME=postgres \
   -e DB_PASSWORD=password \
   --link postgres-url-fetcher:postgres \
@@ -198,7 +198,7 @@ docker build -t url-fetcher .
 ```bash
 # Start PostgreSQL container
 docker run --name postgres-url-fetcher \
-  -e POSTGRES_DB=url_fetcher \
+  -e POSTGRES_DB=url-fetcher \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=password \
   -p 5432:5432 \
@@ -209,7 +209,7 @@ docker run --name url-fetcher-app \
   -p 3000:3000 \
   -e DB_HOST=host.docker.internal \
   -e DB_PORT=5432 \
-  -e DB_NAME=url_fetcher \
+  -e DB_NAME=url-fetcher \
   -e DB_USERNAME=postgres \
   -e DB_PASSWORD=password \
   --link postgres-url-fetcher:postgres \
@@ -517,7 +517,7 @@ For local development with Docker PostgreSQL:
 ```bash
 # Start PostgreSQL container
 docker run --name postgres-url-fetcher \
-  -e POSTGRES_DB=url_fetcher \
+  -e POSTGRES_DB=url-fetcher \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=password \
   -p 5432:5432 \
@@ -534,7 +534,7 @@ environment:
   - PORT=3000
   - DB_HOST=postgres
   - DB_PORT=5432
-  - DB_NAME=url_fetcher
+  - DB_NAME=url-fetcher
   - DB_USERNAME=postgres
   - DB_PASSWORD=password
 ```
