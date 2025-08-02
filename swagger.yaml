@@ -1,0 +1,380 @@
+openapi: 3.0.3
+info:
+  title: URL Fetcher Service API
+  version: 1.0.0
+
+tags:
+  - name: URL Fetching
+    description: Operations for fetching and managing URLs
+
+paths:
+  /v1/url-fetches:
+    post:
+      tags:
+        - URL Fetching
+      summary: Fetch multiple URLs
+      description: Fetch multiple URLs in parallel and store results in PostgreSQL
+      operationId: fetchUrls
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUrlFetchRequest'
+            examples:
+              valid_urls:
+                summary: Valid URLs
+                value:
+                  urls:
+                    - "https://httpbin.org/status/200"
+                    - "https://httpbin.org/status/404"
+                    - "https://example.com"
+              mixed_urls:
+                summary: Mixed valid and invalid URLs
+                value:
+                  urls:
+                    - "https://httpbin.org/status/200"
+                    - "http://localhost"
+                    - "ftp://example.com"
+      responses:
+        '201':
+          description: URLs fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              examples:
+                success:
+                  summary: Successful fetch
+                  value:
+                    message: "URLs fetched successfully"
+                    data:
+                      - id: 1
+                        url: "https://httpbin.org/status/200"
+                        response_status: 200
+                        response_headers:
+                          content-type: "application/json"
+                          server: "gunicorn/19.9.0"
+                        response_body: '{"url": "https://httpbin.org/status/200"}'
+                        content_type: "application/json"
+                        fetched_at: "2024-01-01T12:00:00.000Z"
+        '400':
+          description: Bad request - validation or security error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                security_violation:
+                  summary: Security validation failed
+                  value:
+                    message: "Some URLs failed security validation"
+                    invalidUrls:
+                      - url: "http://localhost"
+                        error: "Hostname localhost is not allowed"
+                      - url: "ftp://example.com"
+                        error: "Protocol ftp: is not allowed"
+                validation_error:
+                  summary: Validation error
+                  value:
+                    message: "Validation failed"
+                    errors:
+                      - "urls should not be empty"
+                      - "urls must be an array"
+        '503':
+          description: Service unavailable - database connection error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Service temporarily unavailable"
+    get:
+      tags:
+        - URL Fetching
+      summary: Get URL fetch results
+      description: Retrieve URL fetch results with pagination and filtering
+      operationId: getUrlFetches
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: status
+          in: query
+          description: Filter by HTTP status code
+          required: false
+          schema:
+            type: integer
+            example: 200
+        - name: url
+          in: query
+          description: Filter by URL pattern (regex)
+          required: false
+          schema:
+            type: string
+            example: "httpbin"
+        - name: startDate
+          in: query
+          description: Filter by start date (ISO 8601)
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: "2024-01-01T00:00:00Z"
+        - name: endDate
+          in: query
+          description: Filter by end date (ISO 8601)
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: "2024-01-31T23:59:59Z"
+      responses:
+        '200':
+          description: URL fetch results retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                success:
+                  summary: Successful retrieval
+                  value:
+                    message: "URL fetch results retrieved successfully"
+                    data:
+                      - id: 1
+                        url: "https://httpbin.org/status/200"
+                        response_status: 200
+                        response_headers:
+                          content-type: "application/json"
+                        response_body: '{"url": "https://httpbin.org/status/200"}'
+                        content_type: "application/json"
+                        fetched_at: "2024-01-01T12:00:00.000Z"
+                    page: 1
+                    limit: 10
+                    totalPages: 5
+                    totalItems: 50
+        '503':
+          description: Service unavailable - database connection error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Service temporarily unavailable"
+
+  /v1/url-fetches/{id}:
+    get:
+      tags:
+        - URL Fetching
+      summary: Get URL fetch by ID
+      description: Retrieve a specific URL fetch result by its ID
+      operationId: getUrlFetchById
+      parameters:
+        - name: id
+          in: path
+          description: URL fetch ID
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            example: 1
+      responses:
+        '200':
+          description: URL fetch retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              examples:
+                success:
+                  summary: Successful retrieval
+                  value:
+                    message: "URL fetch retrieved successfully"
+                    data:
+                      id: 1
+                      url: "https://httpbin.org/status/200"
+                      response_status: 200
+                      response_headers:
+                        content-type: "application/json"
+                      response_body: '{"url": "https://httpbin.org/status/200"}'
+                      content_type: "application/json"
+                      fetched_at: "2024-01-01T12:00:00.000Z"
+        '404':
+          description: URL fetch not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "URL fetch not found"
+        '503':
+          description: Service unavailable - database connection error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Service temporarily unavailable"
+
+components:
+  schemas:
+    CreateUrlFetchRequest:
+      type: object
+      required:
+        - urls
+      properties:
+        urls:
+          type: array
+          items:
+            type: string
+            format: uri
+            description: Array of URLs to fetch
+          minItems: 1
+          maxItems: 100
+          example:
+            - "https://httpbin.org/status/200"
+            - "https://example.com"
+      example:
+        urls:
+          - "https://httpbin.org/status/200"
+          - "https://example.com"
+
+    UrlFetch:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier
+          example: 1
+        url:
+          type: string
+          format: uri
+          description: The fetched URL
+          example: "https://httpbin.org/status/200"
+        response_status:
+          type: integer
+          nullable: true
+          description: HTTP response status code
+          example: 200
+        response_headers:
+          type: object
+          nullable: true
+          description: HTTP response headers
+          additionalProperties:
+            type: string
+          example:
+            content-type: "application/json"
+            server: "gunicorn/19.9.0"
+        response_body:
+          type: string
+          nullable: true
+          description: HTTP response body
+          example: '{"url": "https://httpbin.org/status/200"}'
+        content_type:
+          type: string
+          nullable: true
+          description: Content type of the response
+          example: "application/json"
+        fetched_at:
+          type: string
+          format: date-time
+          description: Timestamp when the URL was fetched
+          example: "2024-01-01T12:00:00.000Z"
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Success message
+          example: "Operation completed successfully"
+        data:
+          oneOf:
+            - $ref: '#/components/schemas/UrlFetch'
+            - type: array
+              items:
+                $ref: '#/components/schemas/UrlFetch'
+          description: Response data
+
+    PaginatedResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            page:
+              type: integer
+              description: Current page number
+              example: 1
+            limit:
+              type: integer
+              description: Number of items per page
+              example: 10
+            totalPages:
+              type: integer
+              description: Total number of pages
+              example: 5
+            totalItems:
+              type: integer
+              description: Total number of items
+              example: 50
+
+
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: "Validation failed"
+        errors:
+          type: array
+          items:
+            type: string
+          description: Detailed error messages
+          example:
+            - "urls should not be empty"
+        invalidUrls:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                description: Invalid URL
+              error:
+                type: string
+                description: Error reason
+          description: List of invalid URLs with error reasons
+          example:
+            - url: "http://localhost"
+              error: "Hostname localhost is not allowed"
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication
+
+security:
+  - ApiKeyAuth: []
+
+externalDocs:
+  description: Find more info about URL Fetcher Service
+  url: https://github.com/your-org/url-fetcher 

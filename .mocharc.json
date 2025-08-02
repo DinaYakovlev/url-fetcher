@@ -1,0 +1,9 @@
+{
+  "require": ["ts-node/register", "tsconfig-paths/register"],
+  "extension": ["ts"],
+  "timeout": 10000,
+  "reporter": "spec",
+  "colors": true,
+  "bail": false,
+  "recursive": true
+} 
